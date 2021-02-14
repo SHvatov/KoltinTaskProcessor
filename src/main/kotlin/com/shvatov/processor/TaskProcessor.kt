@@ -3,6 +3,7 @@ package com.shvatov.processor
 import com.shvatov.processor.config.ProcessorConfiguration
 import com.shvatov.processor.data.Task
 import com.shvatov.processor.data.TaskIdentifier
+import com.shvatov.processor.data.TaskResult
 import kotlinx.coroutines.channels.ReceiveChannel
 
 /**
@@ -10,7 +11,7 @@ import kotlinx.coroutines.channels.ReceiveChannel
  * coroutine scope and the scope of the parent coroutine if such is present.
  * @author shvatov
  */
-interface Processor<P : Any?, R : Any?> : CoroutineScopeAware, CoroutineParentScopeAware {
+interface TaskProcessor<P : Any?, R : Any?> : CoroutineScopeAware, CoroutineParentScopeAware {
     /**
      * Configuration of the processor. For more details - see docs of [ProcessorConfiguration].
      */
@@ -19,7 +20,7 @@ interface Processor<P : Any?, R : Any?> : CoroutineScopeAware, CoroutineParentSc
     /**
      * Channel, which contains the results of the [Task], that have been processed.
      */
-    val outputChannel: ReceiveChannel<Result<R>>
+    val outputChannel: ReceiveChannel<TaskResult<R>>
 
     /**
      * Submits a [Task] for the following processing. Suspends the execution

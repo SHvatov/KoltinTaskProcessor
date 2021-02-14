@@ -43,13 +43,21 @@ data class ProcessorConfiguration(
     /**
      * Number of attempts, that may fail before dispatching a task to sub-processor.
      */
-    val dispatchAttempts: Int = DISPATCH_ATTEMPTS,
+    val dispatchAttempts: Int = DISPATCH_ATTEMPTS_NUMBER,
 
     /**
      * Task execution timeout.
      */
     val taskExecutionTimeout: Long = TASK_EXECUTION_TIMEOUT
 ) {
+    init {
+        require(threadPoolSize in 1..POOL_SIZE)
+        require(subProcessorsNumber in 1..SUB_PROCESSORS_NUMBER)
+        require(dispatchFailureDelay in 1..DISPATCH_FAILURE_DELAY)
+        require(dispatchAttempts in 1..DISPATCH_ATTEMPTS_NUMBER)
+        require(taskExecutionTimeout in 1..TASK_EXECUTION_TIMEOUT)
+    }
+
     companion object {
         const val POOL_SIZE = 3
 
@@ -57,8 +65,8 @@ data class ProcessorConfiguration(
 
         const val DISPATCH_FAILURE_DELAY = 10000L
 
-        const val TASK_EXECUTION_TIMEOUT = 10000L
+        const val TASK_EXECUTION_TIMEOUT = Long.MAX_VALUE
 
-        const val DISPATCH_ATTEMPTS = 10
+        const val DISPATCH_ATTEMPTS_NUMBER = 10
     }
 }

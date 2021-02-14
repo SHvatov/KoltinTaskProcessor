@@ -15,5 +15,11 @@ enum class TaskCompletionState {
      * Task has failed and probably no result is stored within
      * [TaskResult] instance, only the exception which caused the failure.
      */
-    FAILURE
+    FAILURE,
+
+    /**
+     * Task has exceeded the timeout. If provided [Task] supports cancellation,
+     * then result may be null.
+     */
+    TIMEOUT
 }

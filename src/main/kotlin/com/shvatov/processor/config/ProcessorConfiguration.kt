@@ -16,7 +16,7 @@ data class ProcessorConfiguration(
      * Defines the size of the pool to be used as a Dispatcher
      * if [useParentDispatcher] is set to true.
      */
-    val threadPoolSize: Int = if (useParentDispatcher) 0 else POOL_SIZE,
+    val threadPoolSize: Int = if (useParentDispatcher) 0 else MAX_POOL_SIZE,
 
     /**
      * Exception handler for uncaught exceptions during the processing of the task.
@@ -32,41 +32,58 @@ data class ProcessorConfiguration(
     /**
      * Number of the sub-processors to be used for task dispatching.
      */
-    val subProcessorsNumber: Int = SUB_PROCESSORS_NUMBER,
+    val subProcessorsNumber: Int = MAX_SUB_PROCESSORS_NUMBER,
 
     /**
      * Delay, before next attempt to dispatch a task to one of the
      * sub-processors.
      */
-    val dispatchFailureDelay: Long = DISPATCH_FAILURE_DELAY,
+    val dispatchFailureDelay: Long = MAX_DISPATCH_FAILURE_DELAY,
 
     /**
      * Number of attempts, that may fail before dispatching a task to sub-processor.
      */
-    val dispatchAttempts: Int = DISPATCH_ATTEMPTS_NUMBER,
+    val dispatchAttempts: Int = MAX_DISPATCH_ATTEMPTS_NUMBER,
 
     /**
      * Task execution timeout.
      */
-    val taskExecutionTimeout: Long = TASK_EXECUTION_TIMEOUT
+    val taskExecutionTimeout: Long = MAX_TASK_EXECUTION_TIMEOUT,
+
+    /**
+     * Capacity of the output channel.
+     */
+    val outputChannelCapacity: Int = MAX_OUTPUT_CHANNEL_CAPACITY,
+
+    /**
+     * Capacity of the dispatcher. Number of the tasks that can be stored for the further
+     * processing before dispatcher suspends execution of the calling thread.
+     */
+    val dispatcherChannelCapacity: Int = MAX_DISPATCHER_CHANNEL_CAPACITY
 ) {
     init {
-        require(threadPoolSize in 1..POOL_SIZE)
-        require(subProcessorsNumber in 1..SUB_PROCESSORS_NUMBER)
-        require(dispatchFailureDelay in 1..DISPATCH_FAILURE_DELAY)
-        require(dispatchAttempts in 1..DISPATCH_ATTEMPTS_NUMBER)
-        require(taskExecutionTimeout in 1..TASK_EXECUTION_TIMEOUT)
+        require(threadPoolSize in 1..MAX_POOL_SIZE)
+        require(subProcessorsNumber in 1..MAX_SUB_PROCESSORS_NUMBER)
+        require(dispatchFailureDelay in 1..MAX_DISPATCH_FAILURE_DELAY)
+        require(dispatchAttempts in 1..MAX_DISPATCH_ATTEMPTS_NUMBER)
+        require(taskExecutionTimeout in 1..MAX_TASK_EXECUTION_TIMEOUT)
+        require(outputChannelCapacity in 1..MAX_OUTPUT_CHANNEL_CAPACITY)
+        require(dispatcherChannelCapacity in 1..MAX_DISPATCHER_CHANNEL_CAPACITY)
     }
 
     companion object {
-        const val POOL_SIZE = 3
+        const val MAX_POOL_SIZE = 5
 
-        const val SUB_PROCESSORS_NUMBER = 3
+        const val MAX_SUB_PROCESSORS_NUMBER = 3
 
-        const val DISPATCH_FAILURE_DELAY = 10000L
+        const val MAX_DISPATCH_FAILURE_DELAY = 10000L
 
-        const val TASK_EXECUTION_TIMEOUT = Long.MAX_VALUE
+        const val MAX_TASK_EXECUTION_TIMEOUT = Long.MAX_VALUE
 
-        const val DISPATCH_ATTEMPTS_NUMBER = 10
+        const val MAX_DISPATCH_ATTEMPTS_NUMBER = 10
+
+        const val MAX_OUTPUT_CHANNEL_CAPACITY = 10
+
+        const val MAX_DISPATCHER_CHANNEL_CAPACITY = 10
     }
 }

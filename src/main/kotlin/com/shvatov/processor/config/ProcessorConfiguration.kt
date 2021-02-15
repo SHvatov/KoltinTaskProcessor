@@ -73,9 +73,9 @@ data class ProcessorConfiguration(
     }
 
     companion object {
-        const val MAX_POOL_SIZE = 5
+        const val MAX_POOL_SIZE = 10
 
-        const val MAX_SUB_PROCESSORS_NUMBER = 3
+        const val MAX_SUB_PROCESSORS_NUMBER = 1000
 
         const val MAX_DISPATCH_FAILURE_DELAY = 10000L
 
@@ -83,8 +83,8 @@ data class ProcessorConfiguration(
 
         const val MAX_DISPATCH_ATTEMPTS_NUMBER = 10
 
-        const val MAX_OUTPUT_CHANNEL_CAPACITY = 10
+        const val MAX_OUTPUT_CHANNEL_CAPACITY = 100
 
-        const val MAX_DISPATCHER_CHANNEL_CAPACITY = 10
+        const val MAX_DISPATCHER_CHANNEL_CAPACITY = 100
     }
 }

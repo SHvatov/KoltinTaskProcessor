@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import kotlin.system.measureNanoTime
 
 /**
  * Tests for [TaskProcessorImpl] with some examples of the correct usage.
@@ -28,11 +29,14 @@ internal class TaskProcessorImplTest {
                 exceptionHandler = CoroutineExceptionHandler { _, ex -> println(ex.stackTrace) },
                 dispatchFailureDelay = 1000L,
                 taskExecutionTimeout = 1500L,
+                subProcessorsNumber = 3
             ),
             this
         )
 
-        val tasks = (1..10).map {
+        // generate some tasks with estimated time = 100 second
+        // if run sequentially
+        val tasks = (1..100).map {
             val payload = TestPayload(it)
             Task(payload) {
                 delay(1000)
@@ -40,24 +44,83 @@ internal class TaskProcessorImplTest {
             }
         }
 
-        // first obtain a reference to processor's output channel
-        val outputChannel = processor.outputChannel
+        val timeSpent = measureNanoTime {
+            // first obtain a reference to processor's output channel
+            val outputChannel = processor.outputChannel
 
-        // then launch processor in another coroutine to prevent blocking
-        launch {
-            processor.use {
-                tasks.forEach {
-                    submit(it)
+            // then launch processor in another coroutine to prevent blocking
+            launch {
+                processor.use {
+                    tasks.forEach {
+                        submit(it)
+                    }
                 }
+            }
+
+            val results = mutableListOf<TaskResult<TestResult>>()
+            outputChannel.consumeEach {
+                results.add(it)
+                println("Consumed following result: $it\n\t${tasks.size - results.size} left")
+            }
+
+            assertTrue { results.all { it.isSuccess } }
+            assertTrue { results.all { it.result?.hash != null } }
+        }
+
+        println("Time spent processing: $timeSpent ns")
+        assertTrue { timeSpent < 100e9 }
+    }
+
+    @Test
+    fun `successful processing of multiple tasks - use new dispatcher`() = runBlocking<Unit> {
+        val processor = TaskProcessorImpl<TestPayload, TestResult>(
+            ProcessorConfiguration(
+                exceptionHandler = CoroutineExceptionHandler { _, ex -> println(ex.stackTrace) },
+                dispatchFailureDelay = 1000L,
+                taskExecutionTimeout = 1500L,
+                useParentDispatcher = false,
+                threadPoolSize = 5,
+                subProcessorsNumber = 100,
+                outputChannelCapacity = 40,
+                dispatcherChannelCapacity = 25
+            ),
+            this
+        )
+
+        // generate some tasks with estimated time = 100 second
+        // if run sequentially
+        val tasks = (1..100).map {
+            val payload = TestPayload(it)
+            Task(payload) {
+                delay(1000)
+                TestResult(it.id.hashCode().toString())
             }
         }
 
-        val results = mutableListOf<TaskResult<TestResult>>()
-        outputChannel.consumeEach {
-            results.add(it)
+        val timeSpent = measureNanoTime {
+            // first obtain a reference to processor's output channel
+            val outputChannel = processor.outputChannel
+
+            // then launch processor in another coroutine to prevent blocking
+            launch {
+                processor.use {
+                    tasks.forEach {
+                        submit(it)
+                    }
+                }
+            }
+
+            val results = mutableListOf<TaskResult<TestResult>>()
+            outputChannel.consumeEach {
+                results.add(it)
+                println("Consumed following result: $it\n\t${tasks.size - results.size} left")
+            }
+
+            assertTrue { results.all { it.isSuccess } }
+            assertTrue { results.all { it.result?.hash != null } }
         }
 
-        assertTrue { results.all { it.isSuccess } }
-        assertTrue { results.all { it.result?.hash != null } }
+        println("Time spent processing: $timeSpent ns")
+        assertTrue { timeSpent < 100e9 }
     }
 }

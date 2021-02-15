@@ -14,7 +14,7 @@ interface CloseableProcessor {
  * Takes a suspending [block] function and calls it on this[CloseableProcessor] instance.
  * Regardless whether exception is thrown or not calls [CloseableProcessor.close] method.
  */
-suspend fun <T : CloseableProcessor, R> T.use(block: suspend (T) -> R): R {
+suspend fun <T : CloseableProcessor, R> T.use(block: suspend T.() -> R): R {
     return try {
         block(this)
     } finally {

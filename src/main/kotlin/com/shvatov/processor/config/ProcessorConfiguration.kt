@@ -62,7 +62,8 @@ data class ProcessorConfiguration(
     val dispatcherChannelCapacity: Int = MAX_DISPATCHER_CHANNEL_CAPACITY
 ) {
     init {
-        require(threadPoolSize in 1..MAX_POOL_SIZE)
+        if (useParentDispatcher) require(threadPoolSize == 0)
+        else require(threadPoolSize in 1..MAX_POOL_SIZE)
         require(subProcessorsNumber in 1..MAX_SUB_PROCESSORS_NUMBER)
         require(dispatchFailureDelay in 1..MAX_DISPATCH_FAILURE_DELAY)
         require(dispatchAttempts in 1..MAX_DISPATCH_ATTEMPTS_NUMBER)

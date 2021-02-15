@@ -92,6 +92,13 @@ class TaskProcessorImpl<P : Any, R : Any>(
         // because there are no tasks to dispatch left, meaning that processors
         // are now processing their final tasks
         subProcessors.forEach { it.processor.close() }
+
+        // close the output channel after all sub-processors
+        // have finished their jobs
+        subProcessors.forEach { it.isSubProcessorFinished.await() }
+
+        @Suppress("unchecked_cast")
+        (outputChannel as Channel<TaskResult<R>>).close()
     }
 
     /**
@@ -133,14 +140,21 @@ class TaskProcessorImpl<P : Any, R : Any>(
          * is being idle and does nothing at the moment.
          */
         private var _idle: Boolean = false
-        val idle = _idle
+        val idle: Boolean get() = _idle
 
         /**
          * Contains the number of tasks this sub-processor has processed during its whole
          * lifetime. Used by the processor's task dispatching algorithm.
          */
         private var _processedTasks: Long = 0L
-        val processedTasks = _processedTasks
+        val processedTasks: Long get() = _processedTasks
+
+        /**
+         * Determines, whether this sub-processor has finished processing
+         * all incoming tasks or not. Used for the cleanup mechanism.
+         * See [TaskProcessor.close] method.
+         */
+        val isSubProcessorFinished = CompletableDeferred<Boolean>()
 
         /**
          * Child actor which is responsible for the procession of the tasks that are sent
@@ -161,6 +175,8 @@ class TaskProcessorImpl<P : Any, R : Any>(
 
                     _idle = true
                     _processedTasks += 1
+                }.also {
+                    isSubProcessorFinished.complete(true)
                 }
             }
 
@@ -168,7 +184,7 @@ class TaskProcessorImpl<P : Any, R : Any>(
          * Processes the incoming [task]. Based on the configuration, can either re-throw occurred
          * exception or suppress it.
          */
-        private fun CoroutineScope.processTask(identifier: TaskIdentifier, task: Task<P, R>): TaskResult<R> {
+        private suspend fun processTask(identifier: TaskIdentifier, task: Task<P, R>): TaskResult<R> {
             return try {
                 val (payload, action) = task
                 val procResult = action(payload)

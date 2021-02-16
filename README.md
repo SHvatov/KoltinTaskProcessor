@@ -43,10 +43,10 @@ processor has finished. Because of that, access to the
 
 ## Configuration
 
-`TaskProcessor` can be configured in different ways using `ProcessorConfiguration`:
+`TaskProcessor` can be configured in different ways using `TaskProcessorConfiguration`:
 
 ```kotlin
-data class ProcessorConfiguration(
+data class TaskProcessorConfiguration(
     /**
      * Defines, whether a dispatcher from parent coroutine should be used
      * or a new one must be created.

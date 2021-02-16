@@ -1,6 +1,3 @@
 TODO:
-- add tests
 - add more docs and use-cases
 - add logs to the processor
-- fix max and default limits for config
-- refactor tests

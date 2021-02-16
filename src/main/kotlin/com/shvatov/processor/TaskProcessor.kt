@@ -1,6 +1,6 @@
 package com.shvatov.processor
 
-import com.shvatov.processor.config.ProcessorConfiguration
+import com.shvatov.processor.config.TaskProcessorConfiguration
 import com.shvatov.processor.data.Task
 import com.shvatov.processor.data.TaskIdentifier
 import com.shvatov.processor.data.TaskResult
@@ -19,9 +19,9 @@ interface TaskProcessor<P : Any, R : Any> : CloseableProcessor, CoroutineScopeAw
     val processorIdentifier: UUID
 
     /**
-     * Configuration of the processor. For more details - see docs of [ProcessorConfiguration].
+     * Configuration of the processor. For more details - see docs of [TaskProcessorConfiguration].
      */
-    val configuration: ProcessorConfiguration
+    val configuration: TaskProcessorConfiguration
 
     /**
      * Channel, which contains the results of the [Task], that have been processed.

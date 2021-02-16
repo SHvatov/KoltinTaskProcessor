@@ -1,7 +1,7 @@
 package com.shvatov.processor.impl
 
 import com.shvatov.processor.TaskProcessor
-import com.shvatov.processor.config.ProcessorConfiguration
+import com.shvatov.processor.config.TaskProcessorConfiguration
 import com.shvatov.processor.data.Task
 import com.shvatov.processor.data.TaskCompletionState
 import com.shvatov.processor.data.TaskIdentifier
@@ -33,7 +33,7 @@ import kotlin.coroutines.CoroutineContext
 @ObsoleteCoroutinesApi
 @ExperimentalCoroutinesApi
 class TaskProcessorImpl<P : Any, R : Any>(
-    override val configuration: ProcessorConfiguration,
+    override val configuration: TaskProcessorConfiguration,
     override val parentScope: CoroutineScope? = null
 ) : TaskProcessor<P, R> {
     override val processorIdentifier: UUID = UUID.randomUUID()
@@ -214,7 +214,7 @@ class TaskProcessorImpl<P : Any, R : Any>(
         fun prepareCoroutineScope(
             identifier: UUID,
             parentScope: CoroutineScope?,
-            configuration: ProcessorConfiguration
+            configuration: TaskProcessorConfiguration
         ): CoroutineScope {
             require(!configuration.useParentDispatcher || parentScope != null) {
                 "Can't use parent dispatcher when no parent scope is provided"

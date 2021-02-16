@@ -1,6 +1,6 @@
 package com.shvatov.processor.impl
 
-import com.shvatov.processor.config.ProcessorConfiguration
+import com.shvatov.processor.config.TaskProcessorConfiguration
 import com.shvatov.processor.data.Task
 import com.shvatov.processor.data.TaskResult
 import com.shvatov.processor.use
@@ -31,7 +31,7 @@ internal class TaskProcessorImplTest {
     @Timeout(value = 100L, unit = TimeUnit.SECONDS)
     fun `successful processing of multiple tasks - use parent dispatcher`() = runBlocking {
         val processor = TaskProcessorImpl<TestPayload, TestResult>(
-            ProcessorConfiguration(
+            TaskProcessorConfiguration(
                 exceptionHandler = CoroutineExceptionHandler { _, ex -> println(ex.stackTrace) },
                 dispatchFailureDelay = 1000L,
                 taskExecutionTimeout = 1500L,
@@ -46,7 +46,7 @@ internal class TaskProcessorImplTest {
     @Test
     fun `successful processing of multiple tasks - use new dispatcher with more sub-proc`() = runBlocking {
         val processor = TaskProcessorImpl<TestPayload, TestResult>(
-            ProcessorConfiguration(
+            TaskProcessorConfiguration(
                 exceptionHandler = CoroutineExceptionHandler { _, ex -> println(ex.stackTrace) },
                 dispatchFailureDelay = 1000L,
                 taskExecutionTimeout = 1500L,
@@ -65,7 +65,7 @@ internal class TaskProcessorImplTest {
     @Test
     fun `process with failure - ignore exceptions`() = runBlocking {
         val processor = TaskProcessorImpl<TestPayload, TestResult>(
-            ProcessorConfiguration(
+            TaskProcessorConfiguration(
                 exceptionHandler = CoroutineExceptionHandler { _, ex -> println(ex.stackTrace) },
                 dispatchFailureDelay = 1000L,
                 taskExecutionTimeout = 1500L,
@@ -87,7 +87,7 @@ internal class TaskProcessorImplTest {
         assertThrows<UnsupportedOperationException> {
             runBlocking {
                 val processor = TaskProcessorImpl<TestPayload, TestResult>(
-                    ProcessorConfiguration(
+                    TaskProcessorConfiguration(
                         exceptionHandler = CoroutineExceptionHandler { _, ex -> println(ex.stackTrace) },
                         dispatchFailureDelay = 1000L,
                         taskExecutionTimeout = 1500L,

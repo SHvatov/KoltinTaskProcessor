@@ -5,7 +5,7 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 /**
  * @author shvatov
  */
-data class ProcessorConfiguration(
+data class TaskProcessorConfiguration(
     /**
      * Defines, whether a dispatcher from parent coroutine should be used
      * or a new one must be created.

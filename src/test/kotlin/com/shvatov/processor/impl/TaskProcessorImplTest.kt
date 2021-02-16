@@ -40,7 +40,7 @@ internal class TaskProcessorImplTest {
             this
         )
 
-        testProcessor(processor, 100)
+        testProcessor(processor, 10)
     }
 
     @Test
